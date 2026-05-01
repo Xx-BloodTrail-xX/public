@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time in Retirement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,600&family=Manrope:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Manrope', sans-serif;
+            background:
+                radial-gradient(ellipse at top, #ffd89b 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, #ff8a5b 0%, transparent 60%),
+                linear-gradient(180deg, #2d1b4e 0%, #5b2c6f 30%, #c1416f 60%, #ff8a5b 85%, #ffd89b 100%);
+            background-attachment: fixed;
+            color: #fff8e7;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Sun decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 8%;
+            right: 10%;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff5d6 0%, #ffd89b 40%, transparent 70%);
+            box-shadow: 0 0 120px 30px rgba(255, 216, 155, 0.4);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Subtle wave texture at bottom */
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30%;
+            background:
+                repeating-linear-gradient(
+                    180deg,
+                    transparent 0px,
+                    transparent 8px,
+                    rgba(255, 255, 255, 0.03) 8px,
+                    rgba(255, 255, 255, 0.03) 9px
+                );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 50px 40px;
+            background: rgba(255, 248, 231, 0.08);
+            border-radius: 24px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 8px 40px rgba(45, 27, 78, 0.4);
+            border: 1px solid rgba(255, 248, 231, 0.18);
+            max-width: 950px;
+            width: 95%;
+            position: relative;
+            z-index: 1;
+            margin: 30px 15px;
+        }
+
+        .nav-link {
+            position: absolute;
+            top: 20px;
+            left: 24px;
+            color: rgba(255, 248, 231, 0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #fff5d6;
+        }
+
+        .palm-emoji {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+        }
+
+        h1 {
+            font-family: 'Fraunces', serif;
+            font-weight: 800;
+            font-size: 3.2rem;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff5d6 0%, #ffd89b 50%, #ff8a5b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 30px rgba(255, 216, 155, 0.3);
+        }
+
+        .subtitle {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 1.15rem;
+            color: rgba(255, 248, 231, 0.75);
+            margin-bottom: 8px;
+        }
+
+        .start-date {
+            font-size: 0.85rem;
+            color: rgba(255, 248, 231, 0.55);
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .countdown-display {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .time-block {
+            background: rgba(255, 248, 231, 0.12);
+            padding: 22px 18px;
+            border-radius: 16px;
+            min-width: 105px;
+            border: 1px solid rgba(255, 248, 231, 0.15);
+            transition: transform 0.3s;
+        }
+
+        .time-block:hover {
+            transform: translateY(-3px);
+        }
+
+        .time-value {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 2.7rem;
+            color: #fff5d6;
+            text-shadow: 0 0 25px rgba(255, 216, 155, 0.6);
+            line-height: 1;
+        }
+
+        .time-label {
+            font-size: 0.75rem;
+            color: rgba(255, 248, 231, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-top: 8px;
+        }
+
+        .milliseconds-display {
+            font-family: 'Fraunces', serif;
+            font-weight: 800;
+            font-size: 4rem;
+            color: #ffd89b;
+            text-shadow: 0 0 40px rgba(255, 216, 155, 0.7);
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+
+        .ms-label {
+            font-size: 0.8rem;
+            color: rgba(255, 248, 231, 0.55);
+            margin-top: 8px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .stats-section {
+            margin-top: 45px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 248, 231, 0.15);
+        }
+
+        .stats-section h3 {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-weight: 400;
+            color: #ffd89b;
+            margin-bottom: 22px;
+            font-size: 1.2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+            gap: 18px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            background: rgba(255, 248, 231, 0.06);
+            padding: 18px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 248, 231, 0.1);
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 1.6rem;
+            color: #fff5d6;
+            line-height: 1.1;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: rgba(255, 248, 231, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 6px;
+        }
+
+        .quote-section {
+            margin-top: 40px;
+            padding: 25px 20px;
+            background: rgba(255, 248, 231, 0.05);
+            border-radius: 14px;
+            border-left: 3px solid #ffd89b;
+        }
+
+        .quote-text {
+            font-family: 'Fraunces', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: rgba(255, 248, 231, 0.85);
+            line-height: 1.5;
+        }
+
+        .quote-attr {
+            font-size: 0.8rem;
+            color: rgba(255, 248, 231, 0.5);
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        .pre-retirement {
+            display: none;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .pre-retirement h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 2rem;
+            color: #fff5d6;
+            margin-bottom: 15px;
+        }
+
+        .pre-retirement p {
+            color: rgba(255, 248, 231, 0.75);
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .pre-retirement a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #ffd89b, #ff8a5b);
+            color: #2d1b4e;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .pre-retirement a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 138, 91, 0.4);
+        }
+
+        footer {
+            margin-top: 35px;
+            font-size: 0.72rem;
+            color: rgba(255, 248, 231, 0.4);
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2rem; }
+            .time-value { font-size: 2.2rem; }
+            .milliseconds-display { font-size: 3rem; }
+            .container { padding: 40px 20px; }
+            body::before { width: 120px; height: 120px; top: 5%; right: 5%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="nav-link">← home</a>
+
+        <span class="palm-emoji">🌴</span>
+        <h1>Time in Retirement</h1>
+        <p class="subtitle">Every second is yours now.</p>
+        <p class="start-date">Retired since May 1, 2026 · 12:00 PM CST</p>
+
+        <div id="counter-content">
+            <div class="countdown-display">
+                <div class="time-block">
+                    <div class="time-value" id="years">0</div>
+                    <div class="time-label">Years</div>
+                </div>
+                <div class="time-block">
+                    <div class="time-value" id="months">0</div>
+                    <div class="time-label">Months</div>
+                </div>
+                <div class="time-block">
+                    <div class="time-value" id="days">00</div>
+                    <div class="time-label">Days</div>
+                </div>
+                <div class="time-block">
+                    <div class="time-value" id="hours">00</div>
+                    <div class="time-label">Hours</div>
+                </div>
+                <div class="time-block">
+                    <div class="time-value" id="minutes">00</div>
+                    <div class="time-label">Minutes</div>
+                </div>
+                <div class="time-block">
+                    <div class="time-value" id="seconds">00</div>
+                    <div class="time-label">Seconds</div>
+                </div>
+            </div>
+
+            <div class="milliseconds-display" id="milliseconds">.000</div>
+            <div class="ms-label">Milliseconds of Freedom</div>
+
+            <div class="stats-section">
+                <h3>~ a life well-earned ~</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-value" id="total-days">---</div>
+                        <div class="stat-label">Total Days</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🌅</div>
+                        <div class="stat-value" id="sunrises">---</div>
+                        <div class="stat-label">Sunrises</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">☕</div>
+                        <div class="stat-value" id="slow-mornings">---</div>
+                        <div class="stat-label">Slow Mornings</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🎉</div>
+                        <div class="stat-value" id="weekends-unbothered">---</div>
+                        <div class="stat-label">Weekends (now just days)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">⏰</div>
+                        <div class="stat-value" id="alarms-skipped">---</div>
+                        <div class="stat-label">Alarms Not Set</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-value" id="books-possible">---</div>
+                        <div class="stat-label">Books You Could've Read</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quote-section">
+                <div class="quote-text" id="daily-quote">
+                    "Retirement is not the end of the road. It is the beginning of the open highway."
+                </div>
+                <div class="quote-attr" id="quote-author">— Unknown</div>
+            </div>
+        </div>
+
+        <div class="pre-retirement" id="pre-retirement">
+            <h2>Not retired yet! 🤔</h2>
+            <p>The clock starts ticking at <strong>12:00 PM CST on May 1, 2026</strong>.<br>
+            Until then, head back to the countdown.</p>
+            <a href="countdown.html">View Countdown →</a>
+        </div>
+
+        <footer>
+            Counting up since the moment of freedom · Refreshing every millisecond
+        </footer>
+    </div>
+
+    <script>
+        // Retirement start: May 1, 2026 at 12:00 PM CDT (-05:00)
+        const RETIREMENT_START = new Date('2026-05-01T12:00:00-05:00');
+
+        // A small rotating collection of retirement-themed quotes
+        const QUOTES = [
+            { text: "Retirement is not the end of the road. It is the beginning of the open highway.", author: "Unknown" },
+            { text: "The trouble with retirement is that you never get a day off.", author: "Abe Lemons" },
+            { text: "Retirement: when you stop living at work and begin working at living.", author: "Unknown" },
+            { text: "How beautiful it is to do nothing, and then rest afterward.", author: "Spanish Proverb" },
+            { text: "The best time to plant a tree was twenty years ago. The second best time is now.", author: "Chinese Proverb" },
+            { text: "Don't simply retire from something; have something to retire to.", author: "Harry Emerson Fosdick" },
+            { text: "I have never liked working. To me a job is an invasion of privacy.", author: "Danny McGoorty" },
+            { text: "Retire from work, but not from life.", author: "M.K. Soni" },
+            { text: "The question isn't at what age I want to retire, it's at what income.", author: "George Foreman" },
+            { text: "Retirement is wonderful if you have two essentials: much to live on and much to live for.", author: "Unknown" },
+            { text: "Time you enjoy wasting is not wasted time.", author: "Marthe Troly-Curtin" },
+            { text: "There is virtue in work and there is virtue in rest. Use both and overlook neither.", author: "Alan Cohen" },
+        ];
+
+        function getElapsed(start, now) {
+            // Use local timezone for the human-readable breakdown
+            let years = now.getFullYear() - start.getFullYear();
+            let months = now.getMonth() - start.getMonth();
+            let days = now.getDate() - start.getDate();
+            let hours = now.getHours() - start.getHours();
+            let minutes = now.getMinutes() - start.getMinutes();
+            let seconds = now.getSeconds() - start.getSeconds();
+            let ms = now.getMilliseconds() - start.getMilliseconds();
+
+            if (ms < 0) { ms += 1000; seconds--; }
+            if (seconds < 0) { seconds += 60; minutes--; }
+            if (minutes < 0) { minutes += 60; hours--; }
+            if (hours < 0) { hours += 24; days--; }
+            if (days < 0) {
+                // Borrow days from the previous month
+                const prevMonthLastDay = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+                days += prevMonthLastDay;
+                months--;
+            }
+            if (months < 0) { months += 12; years--; }
+
+            return { years, months, days, hours, minutes, seconds, ms };
+        }
+
+        function pad(num, digits) {
+            return num.toString().padStart(digits, '0');
+        }
+
+        function pickQuote(now) {
+            // Rotate quote based on the day so it feels fresh but stable
+            const dayIndex = Math.floor((now - RETIREMENT_START) / (1000 * 60 * 60 * 24));
+            const idx = ((dayIndex % QUOTES.length) + QUOTES.length) % QUOTES.length;
+            return QUOTES[idx];
+        }
+
+        let lastQuoteIdx = -1;
+        function maybeUpdateQuote(now) {
+            const dayIndex = Math.floor((now - RETIREMENT_START) / (1000 * 60 * 60 * 24));
+            const idx = ((dayIndex % QUOTES.length) + QUOTES.length) % QUOTES.length;
+            if (idx !== lastQuoteIdx) {
+                const q = QUOTES[idx];
+                document.getElementById('daily-quote').textContent = `"${q.text}"`;
+                document.getElementById('quote-author').textContent = `— ${q.author}`;
+                lastQuoteIdx = idx;
+            }
+        }
+
+        function update() {
+            const now = new Date();
+
+            if (now < RETIREMENT_START) {
+                document.getElementById('counter-content').style.display = 'none';
+                document.getElementById('pre-retirement').style.display = 'block';
+                return;
+            }
+
+            const e = getElapsed(RETIREMENT_START, now);
+
+            document.getElementById('years').textContent = e.years;
+            document.getElementById('months').textContent = e.months;
+            document.getElementById('days').textContent = pad(e.days, 2);
+            document.getElementById('hours').textContent = pad(e.hours, 2);
+            document.getElementById('minutes').textContent = pad(e.minutes, 2);
+            document.getElementById('seconds').textContent = pad(e.seconds, 2);
+            document.getElementById('milliseconds').textContent = '.' + pad(e.ms, 3);
+
+            // Cumulative stats
+            const totalMs = now - RETIREMENT_START;
+            const totalDays = Math.floor(totalMs / (1000 * 60 * 60 * 24));
+            const totalHours = Math.floor(totalMs / (1000 * 60 * 60));
+
+            document.getElementById('total-days').textContent = totalDays.toLocaleString();
+            document.getElementById('sunrises').textContent = totalDays.toLocaleString();
+            document.getElementById('slow-mornings').textContent = totalDays.toLocaleString();
+
+            // Count weekend days that have passed since retirement
+            let weekendCount = 0;
+            const startMidnight = new Date(RETIREMENT_START);
+            startMidnight.setHours(0, 0, 0, 0);
+            const cur = new Date(startMidnight);
+            for (let i = 0; i < totalDays; i++) {
+                cur.setDate(startMidnight.getDate() + i);
+                const d = cur.getDay();
+                if (d === 0 || d === 6) weekendCount++;
+            }
+            document.getElementById('weekends-unbothered').textContent = weekendCount.toLocaleString();
+
+            // Alarms not set: roughly count weekdays
+            const weekdayCount = totalDays - weekendCount;
+            document.getElementById('alarms-skipped').textContent = weekdayCount.toLocaleString();
+
+            // Books you could've read (assume avg book = 6 hours of reading,
+            // assume you have 2 hours of bonus leisure reading time per day)
+            const booksPossible = Math.floor((totalDays * 2) / 6);
+            document.getElementById('books-possible').textContent = booksPossible.toLocaleString();
+
+            maybeUpdateQuote(now);
+        }
+
+        // Init
+        const initialQuote = pickQuote(new Date());
+        document.getElementById('daily-quote').textContent = `"${initialQuote.text}"`;
+        document.getElementById('quote-author').textContent = `— ${initialQuote.author}`;
+
+        update();
+        setInterval(update, 1);
+    </script>
+</body>
+</html>
