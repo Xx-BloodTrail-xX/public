@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retirement Countdown</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 900px;
+            width: 95%;
+            position: relative;
+        }
+
+        .nav-link {
+            position: absolute;
+            top: 20px;
+            left: 24px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #f39c12, #e74c3c, #9b59b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .target-date {
+            font-size: 1.1rem;
+            color: #a0a0a0;
+            margin-bottom: 40px;
+        }
+
+        .countdown-display {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .time-block {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 25px;
+            border-radius: 15px;
+            min-width: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .time-value {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .time-label {
+            font-size: 0.85rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .milliseconds-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #f39c12;
+            text-shadow: 0 0 30px rgba(243, 156, 18, 0.5);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+        }
+
+        .ms-label {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 10px;
+        }
+
+        .info-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .exclusion-summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .exclusion-summary h3 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .exclusion-grid {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .exclusion-item {
+            text-align: center;
+        }
+
+        .exclusion-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .exclusion-label {
+            font-size: 0.7rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .retired-message {
+            display: none;
+            font-size: 3rem;
+            color: #2ecc71;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        .retired-link {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #ffd89b, #ff8a5b);
+            color: #2d1b4e;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .retired-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 138, 91, 0.4);
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.75rem;
+            color: #555;
+        }
+
+        .toggle-config {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #888;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .toggle-config:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .config-panel {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .config-panel.visible {
+            display: block;
+        }
+
+        .config-section {
+            margin-bottom: 20px;
+        }
+
+        .config-section h4 {
+            color: #f39c12;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .config-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .config-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            color: #aaa;
+        }
+
+        .config-tag.holiday {
+            border-left: 3px solid #3498db;
+        }
+
+        .config-tag.vacation {
+            border-left: 3px solid #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="nav-link">← home</a>
+        <h1>🏖️ Retirement Countdown</h1>
+        <p class="target-date">Target: May 1, 2026 at 12:00 PM CST</p>
+
+        <div id="countdown-content">
+            <div class="countdown-display">
+                <div class="time-block">
+                    <div class="time-value" id="days">000</div>
+                    <div class="time-label">Working Days</div>
+                </div>
+                <div class="time-block">
+                    <div class="time-value" id="hours">00</div>
+                    <div class="time-label">Hours</div>
+                </div>
+                <div class="time-block">
+                    <div class="time-value" id="minutes">00</div>
+                    <div class="time-label">Minutes</div>
+                </div>
+                <div class="time-block">
+                    <div class="time-value" id="seconds">00</div>
+                    <div class="time-label">Seconds</div>
+                </div>
+            </div>
+
+            <div class="milliseconds-display" id="milliseconds">.000</div>
+            <div class="ms-label">Milliseconds</div>
+
+            <div class="info-section">
+                <div class="info-row">
+                    <div class="info-item">
+                        <div class="info-value" id="total-working-days">---</div>
+                        <div class="info-label">Total Working Days</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value" id="total-hours">---</div>
+                        <div class="info-label">Total Working Hours</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value" id="calendar-days">---</div>
+                        <div class="info-label">Calendar Days</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="exclusion-summary">
+                <h3>📅 Days Excluded from Countdown</h3>
+                <div class="exclusion-grid">
+                    <div class="exclusion-item">
+                        <div class="exclusion-count" id="weekend-count">---</div>
+                        <div class="exclusion-label">Weekend Days</div>
+                    </div>
+                    <div class="exclusion-item">
+                        <div class="exclusion-count" id="holiday-count">---</div>
+                        <div class="exclusion-label">Holidays</div>
+                    </div>
+                    <div class="exclusion-item">
+                        <div class="exclusion-count" id="vacation-count">---</div>
+                        <div class="exclusion-label">Vacation Days</div>
+                    </div>
+                    <div class="exclusion-item">
+                        <div class="exclusion-count" id="total-excluded">---</div>
+                        <div class="exclusion-label">Total Excluded</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="toggle-config" onclick="toggleConfig()">⚙️ View Configuration</button>
+
+            <div class="config-panel" id="config-panel">
+                <div class="config-section">
+                    <h4>🇺🇸 US Federal Holidays</h4>
+                    <div class="config-list" id="holiday-list"></div>
+                </div>
+                <div class="config-section">
+                    <h4>🏝️ Vacation Days</h4>
+                    <div class="config-list" id="vacation-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="retired-message" id="retired-message">
+            🎊 CONGRATULATIONS! YOU'RE RETIRED! 🎊
+            <br>
+            <a href="retired.html" class="retired-link">Enter Retirement Counter →</a>
+        </div>
+
+        <footer>
+            Working days = Monday–Friday (excludes weekends, holidays, and vacation)<br>
+            Refreshing every millisecond
+        </footer>
+    </div>
+
+    <script>
+        // ╔════════════════════════════════════════════════════════════════════════════╗
+        // ║                         CONFIGURATION BLOCK                                 ║
+        // ║                    Edit these settings as needed!                           ║
+        // ╚════════════════════════════════════════════════════════════════════════════╝
+
+        const CONFIG = {
+            // Target retirement date and time
+            // Format: 'YYYY-MM-DDTHH:MM:SS-05:00' (the -05:00 is CDT timezone offset)
+            targetDate: '2026-05-01T12:00:00-05:00',
+
+            // Work hours (used for calculating remaining time in current day)
+            workDayStartHour: 9,  // 9 AM
+            workDayEndHour: 17,   // 5 PM (17:00)
+            hoursPerWorkDay: 8,
+
+            // ══════════════════════════════════════════════════════════════════════════
+            // US FEDERAL HOLIDAYS
+            // Format: 'YYYY-MM-DD'
+            // These are standard US Federal holidays observed by most companies
+            // ══════════════════════════════════════════════════════════════════════════
+            holidays: {
+                // 2024 Holidays
+                '2024-01-01': 'New Year\'s Day',
+                '2024-01-15': 'MLK Jr. Day',
+                '2024-02-19': 'Presidents Day',
+                '2024-05-27': 'Memorial Day',
+                '2024-06-19': 'Juneteenth',
+                '2024-07-04': 'Independence Day',
+                '2024-09-02': 'Labor Day',
+                '2024-10-14': 'Columbus Day',
+                '2024-11-11': 'Veterans Day',
+                '2024-11-28': 'Thanksgiving',
+                '2024-11-29': 'Day After Thanksgiving',
+                '2024-12-25': 'Christmas Day',
+
+                // 2025 Holidays
+                '2025-01-01': 'New Year\'s Day',
+                '2025-01-20': 'MLK Jr. Day',
+                '2025-02-17': 'Presidents Day',
+                '2025-05-26': 'Memorial Day',
+                '2025-06-19': 'Juneteenth',
+                '2025-07-04': 'Independence Day',
+                '2025-09-01': 'Labor Day',
+                '2025-10-13': 'Columbus Day',
+                '2025-11-11': 'Veterans Day',
+                '2025-11-27': 'Thanksgiving',
+                '2025-11-28': 'Day After Thanksgiving',
+                '2025-12-25': 'Christmas Day',
+
+                // 2026 Holidays
+                '2026-01-01': 'New Year\'s Day',
+                '2026-01-19': 'MLK Jr. Day',
+                '2026-02-16': 'Presidents Day',
+                '2026-04-03': 'Good Friday (if observed)',
+                '2026-05-25': 'Memorial Day',
+                '2026-06-19': 'Juneteenth',
+                '2026-07-03': 'Independence Day (observed)',
+                '2026-09-07': 'Labor Day',
+                '2026-10-12': 'Columbus Day',
+                '2026-11-11': 'Veterans Day',
+                '2026-11-26': 'Thanksgiving',
+                '2026-11-27': 'Day After Thanksgiving',
+                '2026-12-25': 'Christmas Day',
+            },
+
+            // ══════════════════════════════════════════════════════════════════════════
+            // VACATION DAYS
+            // Add your planned vacation days here!
+            // Format: 'YYYY-MM-DD': 'Description'
+            // ══════════════════════════════════════════════════════════════════════════
+            vacationDays: {
+                '2026-03-12': 'Vacation',
+                '2026-03-13': 'Vacation',
+                '2026-03-19': 'Vacation',
+                '2026-03-20': 'Vacation',
+                '2026-04-16': 'Vacation',
+                '2026-04-17': 'Vacation',
+                //'2026-04-20': 'Vacation',
+                //'2026-04-21': 'Vacation',
+            }
+        };
+
+        // ╔════════════════════════════════════════════════════════════════════════════╗
+        // ║                      END OF CONFIGURATION BLOCK                             ║
+        // ╚════════════════════════════════════════════════════════════════════════════╝
+        // Parse target date
+        const targetDate = new Date(CONFIG.targetDate);
+
+        // Combine holidays and vacation days for exclusion
+        const allExcludedDates = { ...CONFIG.holidays, ...CONFIG.vacationDays };
+
+        // Toggle configuration panel
+        function toggleConfig() {
+            const panel = document.getElementById('config-panel');
+            panel.classList.toggle('visible');
+        }
+
+        // Populate configuration panel
+        function populateConfigPanel() {
+            const holidayList = document.getElementById('holiday-list');
+            const vacationList = document.getElementById('vacation-list');
+
+            // Sort and display holidays
+            const sortedHolidays = Object.entries(CONFIG.holidays).sort((a, b) => a[0].localeCompare(b[0]));
+            sortedHolidays.forEach(([date, name]) => {
+                const tag = document.createElement('span');
+                tag.className = 'config-tag holiday';
+                tag.textContent = `${date}: ${name}`;
+                holidayList.appendChild(tag);
+            });
+
+            // Sort and display vacation days
+            const sortedVacation = Object.entries(CONFIG.vacationDays).sort((a, b) => a[0].localeCompare(b[0]));
+            if (sortedVacation.length === 0) {
+                const tag = document.createElement('span');
+                tag.className = 'config-tag vacation';
+                tag.textContent = 'No vacation days configured';
+                tag.style.opacity = '0.5';
+                vacationList.appendChild(tag);
+            } else {
+                sortedVacation.forEach(([date, name]) => {
+                    const tag = document.createElement('span');
+                    tag.className = 'config-tag vacation';
+                    tag.textContent = `${date}: ${name}`;
+                    vacationList.appendChild(tag);
+                });
+            }
+        }
+
+        // Helper function to format date as YYYY-MM-DD
+        function formatDateKey(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Check if a date is a working day
+        function isWorkingDay(date) {
+            const day = date.getDay();
+            if (day === 0 || day === 6) return false; // Weekend
+
+            const dateStr = formatDateKey(date);
+            if (allExcludedDates[dateStr]) return false; // Holiday or vacation
+
+            return true;
+        }
+
+        // Check if date is a weekend
+        function isWeekend(date) {
+            const day = date.getDay();
+            return day === 0 || day === 6;
+        }
+
+        // Check if date is a holiday
+        function isHoliday(date) {
+            const dateStr = formatDateKey(date);
+            return CONFIG.holidays[dateStr] !== undefined;
+        }
+
+        // Check if date is a vacation day
+        function isVacationDay(date) {
+            const dateStr = formatDateKey(date);
+            return CONFIG.vacationDays[dateStr] !== undefined;
+        }
+
+        // Count exclusions between two dates
+        function countExclusions(startDate, endDate) {
+            let weekends = 0;
+            let holidays = 0;
+            let vacations = 0;
+
+            const current = new Date(startDate);
+            current.setHours(0, 0, 0, 0);
+
+            const end = new Date(endDate);
+            end.setHours(0, 0, 0, 0);
+
+            while (current < end) {
+                if (isWeekend(current)) {
+                    weekends++;
+                } else if (isHoliday(current)) {
+                    holidays++;
+                } else if (isVacationDay(current)) {
+                    vacations++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+
+            return { weekends, holidays, vacations, total: weekends + holidays + vacations };
+        }
+
+        // Count working days between two dates
+        function countWorkingDays(startDate, endDate) {
+            let count = 0;
+            const current = new Date(startDate);
+            current.setHours(0, 0, 0, 0);
+
+            const end = new Date(endDate);
+            end.setHours(0, 0, 0, 0);
+
+            while (current < end) {
+                if (isWorkingDay(current)) {
+                    count++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            return count;
+        }
+
+        // Calculate working milliseconds remaining
+        function getWorkingMillisecondsRemaining(now, target) {
+            if (now >= target) return 0;
+
+            const todayStart = new Date(now);
+            todayStart.setHours(0, 0, 0, 0);
+
+            const targetDayStart = new Date(target);
+            targetDayStart.setHours(0, 0, 0, 0);
+
+            // Count full working days between today and target
+            let fullWorkingDays = 0;
+            const current = new Date(todayStart);
+            current.setDate(current.getDate() + 1); // Start from tomorrow
+
+            while (current < targetDayStart) {
+                if (isWorkingDay(current)) {
+                    fullWorkingDays++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+
+            // Calculate remaining time today (if it's a working day)
+            let todayRemainingMs = 0;
+            if (isWorkingDay(todayStart)) {
+                const endOfWorkToday = new Date(todayStart);
+                endOfWorkToday.setHours(CONFIG.workDayEndHour, 0, 0, 0);
+
+                if (now < endOfWorkToday) {
+                    todayRemainingMs = endOfWorkToday - now;
+                }
+            }
+
+            // Calculate time on target day (if it's a working day)
+            let targetDayMs = 0;
+            if (isWorkingDay(targetDayStart)) {
+                const targetDayWorkStart = new Date(targetDayStart);
+                targetDayWorkStart.setHours(CONFIG.workDayStartHour, 0, 0, 0);
+
+                targetDayMs = target - targetDayWorkStart;
+                if (targetDayMs < 0) targetDayMs = 0;
+            }
+
+            // Total working milliseconds
+            const workdayMs = CONFIG.hoursPerWorkDay * 60 * 60 * 1000;
+            const totalMs = todayRemainingMs + (fullWorkingDays * workdayMs) + targetDayMs;
+
+            return Math.max(0, totalMs);
+        }
+
+        function formatNumber(num, digits) {
+            return num.toString().padStart(digits, '0');
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+
+            if (now >= targetDate) {
+                document.getElementById('countdown-content').style.display = 'none';
+                document.getElementById('retired-message').style.display = 'block';
+                createConfetti();
+                return;
+            }
+
+            // Calculate working time remaining
+            const totalCalendarMs = targetDate - now;
+            const calendarDays = Math.floor(totalCalendarMs / (1000 * 60 * 60 * 24));
+
+            // Count total working days
+            const totalWorkingDays = countWorkingDays(now, targetDate);
+
+            // Count exclusions
+            const exclusions = countExclusions(now, targetDate);
+
+            // Get working time breakdown
+            const workingMs = getWorkingMillisecondsRemaining(now, targetDate);
+
+            const workingSeconds = Math.floor(workingMs / 1000);
+            const workingMinutes = Math.floor(workingSeconds / 60);
+            const workingHours = Math.floor(workingMinutes / 60);
+            const workingDays = Math.floor(workingHours / CONFIG.hoursPerWorkDay);
+
+            const displayHours = workingHours % CONFIG.hoursPerWorkDay;
+            const displayMinutes = workingMinutes % 60;
+            const displaySeconds = workingSeconds % 60;
+            const displayMs = workingMs % 1000;
+
+            // Update display
+            document.getElementById('days').textContent = formatNumber(workingDays, 3);
+            document.getElementById('hours').textContent = formatNumber(displayHours, 2);
+            document.getElementById('minutes').textContent = formatNumber(displayMinutes, 2);
+            document.getElementById('seconds').textContent = formatNumber(displaySeconds, 2);
+            document.getElementById('milliseconds').textContent = '.' + formatNumber(displayMs, 3);
+
+            // Update info section
+            document.getElementById('total-working-days').textContent = totalWorkingDays.toLocaleString();
+            document.getElementById('total-hours').textContent = (totalWorkingDays * CONFIG.hoursPerWorkDay).toLocaleString();
+            document.getElementById('calendar-days').textContent = calendarDays.toLocaleString();
+
+            // Update exclusion counts
+            document.getElementById('weekend-count').textContent = exclusions.weekends.toLocaleString();
+            document.getElementById('holiday-count').textContent = exclusions.holidays.toLocaleString();
+            document.getElementById('vacation-count').textContent = exclusions.vacations.toLocaleString();
+            document.getElementById('total-excluded').textContent = exclusions.total.toLocaleString();
+        }
+
+        function createConfetti() {
+            const colors = ['#f39c12', '#e74c3c', '#9b59b6', '#3498db', '#2ecc71'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 50);
+            }
+        }
+
+        // Initialize
+        populateConfigPanel();
+        setInterval(updateCountdown, 1);
+        updateCountdown();
+    </script>
+</body>
+</html>
